@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import os
+import re
+from datetime import datetime
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
@@ -11,7 +13,10 @@ SPOTIFY_CLIENT_ID = os.environ["SPOTIFY_CLIENT_ID"]
 SPOTIFY_KEY = 'gbh5f5aet8xv9tz3kud9ga5ahykjbshq'
 
 user_choice = input("Enter in what year you want to traver following the format YYYY-MM-DD: \n")
-response = requests.get(f"{URL_ENDPOINTS}/{user_choice}")
+if re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", user_choice) is None:
+    raise ValueError("Date must use the YYYY-MM-DD format.")
+datetime.strptime(user_choice, "%Y-%m-%d")
+response = requests.get(f"{URL_ENDPOINTS}/{user_choice}", timeout=(5, 30), allow_redirects=False)
 soup = BeautifulSoup(response.text, "html.parser")
 musics_title = soup.find_all(name="span", class_=f"{CLASS_DATA}__song")
 #  musics_artist = soup.find_all(name="span", class_=f"{CLASS_DATA}__artist")
